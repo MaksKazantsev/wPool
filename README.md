@@ -13,11 +13,11 @@ import(
 )
 
 func main() {
-	pool := wpool.NewPool(5) // Inits new worker pull, function accepts workers capacity.
+	pool := wpool.NewPool(5) // Init new worker pull, function accepts workers capacity.
 	
 	go func() {
 		time.Sleep(time.Second * 5) // Give time to worker pool to task all functions.
-		pool.Stop() // 
+		pool.Stop() // Stop worker pool.
         }()
 	
 	for i := 0; i < 15; i++ { 
