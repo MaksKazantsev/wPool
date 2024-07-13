@@ -13,14 +13,14 @@ import(
 )
 
 func main() {
-	pool := wpool.NewPool(5) // Init new worker pull, function accepts workers capacity.
+	pool := wpool.NewPool(5) // Inits new worker pull, function accepts workers capacity.
 	
 	go func() {
-		time.Sleep(time.Second * 5) // Give time to worker pool to execute.
+		time.Sleep(time.Second * 5) // Give time to worker pool to task all functions.
 		pool.Stop() // 
         }()
 	
-	for i := 0; i < 10; i++ { 
+	for i := 0; i < 15; i++ { 
 		pool.Task(func() error { // Task new function.
 			// Your task.
 		    return nil
@@ -29,6 +29,6 @@ func main() {
 	
 	// Catch all errors from the pool.
 	for err := range pool.AwaitError() {
-		fmt.Println(err)
+		log.Println(err)
         }
 }
