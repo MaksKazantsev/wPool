@@ -3,6 +3,7 @@
 ### Import package with:
 go get github.com/MaksKazantsev/wPool
 ### Getting started:
+```go
 package main
 
 import(
