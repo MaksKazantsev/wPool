@@ -1,8 +1,8 @@
-### wPool - Golang realization of a simple worker pull.
+# wPool - Golang realization of a simple worker pull.
 ## Usage:
-# Import package with:
+### Import package with:
 go get github.com/MaksKazantsev/wPool
-# Getting started:
+### Getting started:
 package main
 
 import(
