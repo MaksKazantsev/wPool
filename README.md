@@ -28,7 +28,7 @@ func main() {
         }
 	
 	// Catch all errors from the pool.
-	for err := range pool.AwaitError() {
+	for err := range pool.CatchError() {
 		log.Println(err)
         }
 }
