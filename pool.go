@@ -16,6 +16,8 @@ type pool struct {
 	errorCh chan error
 	taskCh  chan Tasker
 	stopCh  chan struct{}
+
+	wg sync.WaitGroup
 }
 
 var _ Pool = &pool{}
@@ -26,6 +28,7 @@ func NewPool(maxWorkers int) *pool {
 		taskCh:     make(chan Tasker, maxWorkers),
 		errorCh:    make(chan error, maxWorkers),
 		maxWorkers: maxWorkers,
+		wg:         sync.WaitGroup{},
 	}
 
 	p.run()
@@ -34,28 +37,36 @@ func NewPool(maxWorkers int) *pool {
 }
 
 func (p *pool) run() {
-	wg := sync.WaitGroup{}
-	wg.Add(p.maxWorkers)
+	p.wg.Add(p.maxWorkers)
 
-	for range p.maxWorkers {
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
+	for i := 0; i < p.maxWorkers; i++ {
+		go func() {
+			defer p.wg.Done()
 
-			for t := range p.taskCh {
-				if err := t(); err != nil {
-					p.errorCh <- err
+			for {
+				select {
+				case t, ok := <-p.taskCh:
+					if !ok {
+						return
+					}
+					if err := t(); err != nil {
+						p.errorCh <- err
+					}
+				case <-p.stopCh:
+					return
 				}
 			}
-		}(&wg)
+		}()
 	}
 	go func() {
-		wg.Wait()
+		p.wg.Wait()
 		close(p.errorCh)
 	}()
 }
 
 func (p *pool) Stop() {
 	close(p.taskCh)
+	close(p.stopCh)
 }
 
 func (p *pool) Task(tasker Tasker) {
